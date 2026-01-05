@@ -1,0 +1,34 @@
+(function () {
+    var ROLE_NAME = 'x_mscnj_pets.pets_state';
+
+    // Get the role sys_id
+    var roleGR = new GlideRecord('sys_user_role');
+    roleGR.addQuery('name', ROLE_NAME);
+    roleGR.query();
+
+    if (!roleGR.next()) {
+        gs.print('Role not found: ' + ROLE_NAME);
+        return;
+    }
+
+    var roleSysId = roleGR.getUniqueValue();
+
+    // Query users who have the role
+    var userRoleGR = new GlideRecord('sys_user_has_role');
+    userRoleGR.addQuery('role', roleSysId);
+    userRoleGR.query();
+
+    gs.print('Users with role: ' + ROLE_NAME);
+    gs.print('----------------------------------');
+
+    while (userRoleGR.next()) {
+        var user = userRoleGR.user.getRefRecord();
+        if (user.isValidRecord()) {
+            gs.print(
+                'User: ' + user.name +
+                ' | Username: ' + user.user_name +
+                ' | Email: ' + user.email
+            );
+        }
+    }
+})();
